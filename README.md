@@ -49,5 +49,5 @@ We refine three network output vectors by solving a optimization problem. See im
 <img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png" width="800">
 
 ### AFW
-<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/AFW.png" width="800">
+<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/AFW.png" width="500">
 
