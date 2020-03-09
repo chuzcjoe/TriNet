@@ -30,3 +30,7 @@ tk==8.6.8
 torch==1.4.0                    
 torchvision==0.5.0                    
 tqdm==4.43.0             
+
+## Data Pre-processing
+
+Three datasets are involved: BIWI, AFLW, 300W_LP. We describe how we obtain three directional vectors in data/computeMAE.py file
