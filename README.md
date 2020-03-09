@@ -1,9 +1,9 @@
 # TriNet
 TriNet for 3DOF object pose estimation
-<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/demo.jpg" width="600">
+<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/demo.jpg" width="800">
 
 ## Network Overview
-![image](https://github.com/chuzcjoe/TriNet/raw/master/imgs/NN.png)
+<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/NN.png" width="800">
 
 ## Train
 python train.py --train_data --valid_data --basenet --alpha_reg --beta --num_bins --batch_size --save_dir --ortho_loss --cls_loss --reg_loss
@@ -46,6 +46,8 @@ We refine three network output vectors by solving a optimization problem. See im
 ## Experiments
 
 ### AFLW2000
-![image](https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png)
+<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png" width="800">
+
 ### AFW
-![image](https://github.com/chuzcjoe/TriNet/raw/master/imgs/AFW.png)
+<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/AFW.png" width="800">
+
