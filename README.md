@@ -35,3 +35,7 @@ tqdm==4.43.0
 ## Data Pre-processing
 
 Three datasets are involved: BIWI, AFLW, 300W_LP. We describe how we obtain three directional vectors in data/computeMAE.py file
+
+## Vector Refinement
+
+We refine three network output vectors by solving a optimization problem. See implementation details in Optimization/optimize.py
