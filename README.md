@@ -67,9 +67,9 @@ We refine three network output vectors by solving a optimization problem. See im
 |  TriNet(mobilenetv2) | 2.86  | 5.25  | 5.34  | 4.48  |
 |  TriNet(resnet50) | 2.61  | 4.25  | 4.70  | 3.86  |
 
-### AFLW2000
+### Error distribution testing on AFLW2000
 <img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png" width="800">
 
-### AFW
+### Testing on AFW
 <img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/AFW.png" width="500">
 
