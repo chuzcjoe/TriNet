@@ -1,5 +1,6 @@
 # TriNet
 TriNet for 3DOF object pose estimation
+![image](https://github.com/chuzcjoe/TriNet/raw/master/imgs/demo.jpg)
 
 ## Train
 python train.py --train_data --valid_data --basenet --alpha_reg --beta --num_bins --batch_size --save_dir --ortho_loss --cls_loss --reg_loss
