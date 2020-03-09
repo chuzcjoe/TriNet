@@ -58,14 +58,14 @@ We refine three network output vectors by solving a optimization problem. See im
 ### Comparison to state-of-the-art methods on BIWI
 | Method  |  roll | pitch  | yaw  |  MAE |
 |---|---|---|---|---|
-| Dlib  | 10.545  | 13.633  | 23.153  | 15.777  |
-| 3DDFA  | 8.250  | 8.530  | 8.5400  | 7.393  |
+| Dlib  | 9.324  | 15.505  | 20.581  | 15.137  |
+| 3DDFA  | 11.770  | 11.180  | 8.691  | 10.547  |
 |KEPLER|16.196|17.277|8.691|10.547|
-|  Hopenet | 5.674  | 6.637  | 6.920  | 6.410  |
-|  Quatnet | 3.920  | 5.615  | 3.973  | 4.503  |
-|  FSA_Caps_Fusion |  4.64 | 6.08  | 4.50  | 5.07  |
-|  TriNet(mobilenetv2) | 2.86  | 5.25  | 5.34  | 4.48  |
-|  TriNet(resnet50) | 2.61  | 4.25  | 4.70  | 3.86  |
+|  Hopenet | 3.269  | 6.606  | 4.810  | 4.895  |
+|  Quatnet | 2.936  | 5.492  | 4.010  | 4.146  |
+|  FSA_Caps_Fusion |  2.76 | 4.96  | 4.27  | 4.00  |
+|  TriNet(mobilenetv2) | 6.94  | 6.75  | 4.02  | 5.90  |
+|  TriNet(resnet50) | 3.67  | 4.99  | 3.27  | 3.97  |
 
 ### Error distribution testing on AFLW2000
 <img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png" width="800">
