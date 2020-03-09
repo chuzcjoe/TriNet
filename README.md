@@ -1,6 +1,6 @@
 # TriNet
 TriNet for 3DOF object pose estimation
-![image](https://github.com/chuzcjoe/TriNet/raw/master/imgs/demo.jpg)
+<img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/demo.jpg" width="600">
 
 ## Network Overview
 ![image](https://github.com/chuzcjoe/TriNet/raw/master/imgs/NN.png)
