@@ -55,6 +55,18 @@ We refine three network output vectors by solving a optimization problem. See im
 |  TriNet(mobilenetv2) | 2.86  | 5.25  | 5.34  | 4.48  |
 |  TriNet(resnet50) | 2.61  | 4.25  | 4.70  | 3.86  |
 
+### Comparison to state-of-the-art methods on BIWI
+| Method  |  roll | pitch  | yaw  |  MAE |
+|---|---|---|---|---|
+| Dlib  | 10.545  | 13.633  | 23.153  | 15.777  |
+| 3DDFA  | 8.250  | 8.530  | 8.5400  | 7.393  |
+|KEPLER|16.196|17.277|8.691|10.547|
+|  Hopenet | 5.674  | 6.637  | 6.920  | 6.410  |
+|  Quatnet | 3.920  | 5.615  | 3.973  | 4.503  |
+|  FSA_Caps_Fusion |  4.64 | 6.08  | 4.50  | 5.07  |
+|  TriNet(mobilenetv2) | 2.86  | 5.25  | 5.34  | 4.48  |
+|  TriNet(resnet50) | 2.61  | 4.25  | 4.70  | 3.86  |
+
 ### AFLW2000
 <img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png" width="800">
 
