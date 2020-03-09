@@ -44,6 +44,16 @@ Three datasets are involved: BIWI, AFLW, 300W_LP. We describe how we obtain thre
 We refine three network output vectors by solving a optimization problem. See implementation details in Optimization/optimize.py
 
 ## Experiments
+### Comparison to state-of-the-art methods
+| Method  |  roll | pitch  | yaw  |  MAE |
+|---|---|---|---|---|
+| Dlib  | 10.545  | 13.633  | 23.153  | 15.777  |
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
+|   |   |   |   |   |
 
 ### AFLW2000
 <img src="https://github.com/chuzcjoe/TriNet/raw/master/imgs/Euler%20Angles%20Errors.png" width="800">
