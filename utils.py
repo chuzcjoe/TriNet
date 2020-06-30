@@ -26,6 +26,12 @@ def mkdir(dir_path):
     if not os.path.exists(dir_path):
         os.mkdir(dir_path)
 
+def bbox_300W(txt_path):
+
+    with open(txt_path, 'r') as f:
+        lines = f.read().splitlines()
+
+    return list(map(int, lines[1].split(',')))
 
 def norm_vector(v):
     """
@@ -120,7 +126,7 @@ def draw_front(img, x, y, width, tdx=None, tdy=None, size=100, color=(0, 255, 0)
     x2 = tdx + size * x
     y2 = tdy - size * y
     y2 = tdy + size * y
-    cv2.arrowedLine(img, (int(tdx), int(tdy)), (int(x2), int(y2)), color, 2, tipLength=0.3)
+    cv2.arrowedLine(img, (int(tdx), int(tdy)), (int(x2), int(y2)), color, tipLength=0.2, thickness=5)
     return img
 
 
@@ -162,7 +168,7 @@ def draw_axis(img, pitch, yaw, roll, tdx=None, tdy=None, size=60):
 
     cv2.line(img, (int(tdx), int(tdy)), (int(x1), int(y1)), (0, 255, 255), 3)
     cv2.line(img, (int(tdx), int(tdy)), (int(x2), int(y2)), (0, 255, 0), 3)
-    cv2.line(img, (int(tdx), int(tdy)), (int(x3), int(y3)), (255, 0, 0), 2)
+    cv2.line(img, (int(tdx), int(tdy)), (int(x3), int(y3)), (255, 0, 0), 3)
 
     return img
 
@@ -419,7 +425,7 @@ def smooth_one_hot(true_labels, classes, smoothing=0.1):
     return true_dist[0]
 
 
-def get_soft_label(cls_label, num_classes, slop = 0.7, dis_coef = 2, coef = 1):
+def get_soft_label(cls_label, num_classes, slop = 1, dis_coef = 0.5, coef = 1):
     """
     compute soft label replace one-hot label
     :param cls_label:ground truth class label
@@ -435,15 +441,16 @@ def get_soft_label(cls_label, num_classes, slop = 0.7, dis_coef = 2, coef = 1):
     def metrix_fun(a, b):
         a = a.type_as(torch.FloatTensor())
         b = b.type_as(torch.FloatTensor())
-        metrix_dis = (a - b) ** dis_coef
-        metrix_dis = (a * slop - b * slop) ** dis_coef
+        metrix_dis = torch.abs(a - b) ** dis_coef
+        #metrix_dis = (a * slop - b * slop) ** dis_coef
+        #print(metrix_dis)
         return metrix_dis 
 
     def exp(x):
         x = x.type_as(torch.FloatTensor())
         return torch.exp(x)
 
-    rt = torch.IntTensor([cls_label])  # must be torch.IntTensor or torch.LongTensor
+    rt = torch.IntTensor([cls_label]*num_classes)  # must be torch.IntTensor or torch.LongTensor
     rk = torch.IntTensor([idx for idx in range(1, num_classes + 1, 1)])
     metrix_vector = exp(-metrix_fun(rt, rk)) * coef
 
@@ -452,7 +459,7 @@ def get_soft_label(cls_label, num_classes, slop = 0.7, dis_coef = 2, coef = 1):
 
 def computeLoss(cls_label_v1, cls_label_v2, cls_label_v3,
                 vector_label_v1, vector_label_v2, vector_label_v3, 
-                logits, softmax, cls_criterion, reg_criterion, params, cls_coef=1):
+                logits, softmax, sigmoid, cls_criterion, reg_criterion, l_targets, d_targets, f_targets, params, cls_coef=1):
 
     num_classes, alpha, beta, cls_type, reg_type, add_ortho = params
 
@@ -486,20 +493,52 @@ def computeLoss(cls_label_v1, cls_label_v2, cls_label_v3,
 
     # -------------------------------------------BCELoss(for classify, manually apply softmax layer)---------------------------------------------
     if cls_type == "BCE":
-        x_cls_loss_v1 = cls_criterion(softmax(x_pred_v1), x_cls_label_v1)
-        y_cls_loss_v1 = cls_criterion(softmax(y_pred_v1), y_cls_label_v1)
-        z_cls_loss_v1 = cls_criterion(softmax(z_pred_v1), z_cls_label_v1)
+        assert ((cls_label_v1 >= 0.) & (cls_label_v1 <= 1.)).all()
+        x_cls_loss_v1 = cls_criterion(sigmoid(x_pred_v1), x_cls_label_v1)
+        y_cls_loss_v1 = cls_criterion(sigmoid(y_pred_v1), y_cls_label_v1)
+        z_cls_loss_v1 = cls_criterion(sigmoid(z_pred_v1), z_cls_label_v1)
 
-        x_cls_loss_v2 = cls_criterion(softmax(x_pred_v2), x_cls_label_v2)
-        y_cls_loss_v2 = cls_criterion(softmax(y_pred_v2), y_cls_label_v2)
-        z_cls_loss_v2 = cls_criterion(softmax(z_pred_v2), z_cls_label_v2)
+        assert ((cls_label_v2 >= 0.) & (cls_label_v2 <= 1.)).all()
+        x_cls_loss_v2 = cls_criterion(sigmoid(x_pred_v2), x_cls_label_v2)
+        y_cls_loss_v2 = cls_criterion(sigmoid(y_pred_v2), y_cls_label_v2)
+        z_cls_loss_v2 = cls_criterion(sigmoid(z_pred_v2), z_cls_label_v2)
 
-        x_cls_loss_v3 = cls_criterion(softmax(x_pred_v3), x_cls_label_v3)
-        y_cls_loss_v3 = cls_criterion(softmax(y_pred_v3), y_cls_label_v3)
-        z_cls_loss_v3 = cls_criterion(softmax(z_pred_v3), z_cls_label_v3)
+        assert ((cls_label_v3 >= 0.) & (cls_label_v3 <= 1.)).all()
+        x_cls_loss_v3 = cls_criterion(sigmoid(x_pred_v3), x_cls_label_v3)
+        y_cls_loss_v3 = cls_criterion(sigmoid(y_pred_v3), y_cls_label_v3)
+        z_cls_loss_v3 = cls_criterion(sigmoid(z_pred_v3), z_cls_label_v3)
+
+    elif cls_type == 'CrossEntropy':
+        x_cls_loss_v1 = cls_criterion(x_pred_v1, l_targets[:,0])
+        y_cls_loss_v1 = cls_criterion(y_pred_v1, l_targets[:,1])
+        z_cls_loss_v1 = cls_criterion(z_pred_v1, l_targets[:,2])
+
+        x_cls_loss_v2 = cls_criterion(x_pred_v2, d_targets[:,0])
+        y_cls_loss_v2 = cls_criterion(y_pred_v2, d_targets[:,1])
+        z_cls_loss_v2 = cls_criterion(z_pred_v2, d_targets[:,2])
+        
+        x_cls_loss_v3 = cls_criterion(x_pred_v3, f_targets[:,0])
+        y_cls_loss_v3 = cls_criterion(y_pred_v3, f_targets[:,1])
+        z_cls_loss_v3 = cls_criterion(z_pred_v3, f_targets[:,2])
+
+
+    #----------------------------------------FocalLoss-----------------------------------------
+    elif cls_type == 'FocalLoss':
+        x_cls_loss_v1 = cls_criterion(x_pred_v1, l_targets[:,0])
+        y_cls_loss_v1 = cls_criterion(y_pred_v1, l_targets[:,1])
+        z_cls_loss_v1 = cls_criterion(z_pred_v1, l_targets[:,2])
+
+        x_cls_loss_v2 = cls_criterion(x_pred_v2, d_targets[:,0])
+        y_cls_loss_v2 = cls_criterion(y_pred_v2, d_targets[:,1])
+        z_cls_loss_v2 = cls_criterion(z_pred_v2, d_targets[:,2])
+
+        x_cls_loss_v3 = cls_criterion(x_pred_v3, f_targets[:,0])
+        y_cls_loss_v3 = cls_criterion(y_pred_v3, f_targets[:,1])
+        z_cls_loss_v3 = cls_criterion(z_pred_v3, f_targets[:,2])
+
 
     # -------------------------------------------KL Divergence Loss-------------------------------------
-    if cls_type == "KLDiv":
+    elif cls_type == "KLDiv":
         x_cls_loss_v1 = cls_criterion((softmax(x_pred_v1)+10e-6).log(), x_cls_label_v1+10e-6)
         y_cls_loss_v1 = cls_criterion((softmax(y_pred_v1)+10e-6).log(), y_cls_label_v1+10e-6)
         z_cls_loss_v1 = cls_criterion((softmax(z_pred_v1)+10e-6).log(), z_cls_label_v1+10e-6)
@@ -513,18 +552,6 @@ def computeLoss(cls_label_v1, cls_label_v2, cls_label_v3,
         z_cls_loss_v3 = cls_criterion((softmax(z_pred_v3)+10e-6).log(), z_cls_label_v3+10e-6)
 
     length = x_pred_v1.shape[0]
-    # -------------------------------------------hellinger(for classify, manually apply softmax layer)---------------------------------------------
-    #x_cls_loss_f = reg_criterion(hellinger(softmax(x_cls_pred_f), x_cls_label_f), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-    #y_cls_loss_f = reg_criterion(hellinger(softmax(y_cls_pred_f), y_cls_label_f), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-    #z_cls_loss_f = reg_criterion(hellinger(softmax(z_cls_pred_f), z_cls_label_f), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-
-    #x_cls_loss_r = reg_criterion(hellinger(softmax(x_cls_pred_r), x_cls_label_r), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-    #y_cls_loss_r = reg_criterion(hellinger(softmax(y_cls_pred_r), y_cls_label_r), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-    #z_cls_loss_r = reg_criterion(hellinger(softmax(z_cls_pred_r), z_cls_label_r), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-
-    #x_cls_loss_u = reg_criterion(hellinger(softmax(x_cls_pred_u), x_cls_label_u), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-    #y_cls_loss_u = reg_criterion(hellinger(softmax(y_cls_pred_u), y_cls_label_u), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
-    #z_cls_loss_u = reg_criterion(hellinger(softmax(z_cls_pred_u), z_cls_label_u), torch.tensor(np.array([0.0]*length, dtype=np.float32)).cuda(0))
 
 
     # get prediction vector(get continue value from classify result)
