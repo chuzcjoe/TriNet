@@ -11,7 +11,7 @@ import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
 from log import Logger
 from dataset import loadData
-from net import ResNet
+from net import ResNet, MobileNetV2
 from tensorboardX import SummaryWriter
 from torchvision.models.mobilenet import model_urls
 import torchvision
@@ -22,10 +22,10 @@ def parse_args():
     parser = argparse.ArgumentParser(description="TriNet: Head Pose Estimation")
     parser.add_argument("--epochs", dest="epochs", help="Maximum number of training epochs.",
                         default=20, type=int)
-    parser.add_argument("--basenet", dest="basenet",help="choice of basenet", nargs="+", default="resnet50")
-    parser.add_argument("--alpha_reg", dest="alpha_reg", help="regression coef", nargs="+", default="1.0 2.0")
-    parser.add_argument("--beta", dest="beta", help="ortho coef", nargs="+", default="0.3 0.6 0.9")
-    parser.add_argument("--num_bins", dest="num_bins", help="number of bins", nargs="+", default="40 60")
+    parser.add_argument("--basenet", dest="basenet",help="choice of basenet", nargs="+", default="mobilenet")
+    parser.add_argument("--alpha_reg", dest="alpha_reg", help="regression coef", nargs="+", default="1.0")
+    parser.add_argument("--beta", dest="beta", help="ortho coef", nargs="+", default="0.3")
+    parser.add_argument("--num_bins", dest="num_bins", help="number of bins", nargs="+", default="40")
     parser.add_argument("--batch_size", dest="batch_size", help="batch size",
                         default=64, type=int)
     parser.add_argument("--lr_resnet", dest="lr_resnet", help="Base learning rate",
@@ -34,7 +34,7 @@ def parse_args():
     parser.add_argument("--lr_decay", dest="lr_decay", help="learning rate decay rate",
                         default=0.95, type=float)
     parser.add_argument("--save_dir", dest="save_dir", help="directory path of saving results",
-                        default='./experiments', type=str)
+                        default='./experiments_expand', type=str)
     parser.add_argument("--train_data", dest="train_data", help="directory path of train dataset",
                         default="", type=str)
     parser.add_argument("--valid_data", dest="valid_data", help="directory path of valid dataset",
@@ -131,10 +131,10 @@ def train(net, bins, alpha, beta, batch_size):
     """ 
     # create model
     if net == "resnet50":
-          model = ResNet(torchvision.models.resnet50(pretrained=True), num_classes=bins)
+          model = ResNet(torchvision.models.resnet50(pretrained=False), num_classes=bins)
           lr = args.lr_resnet
     else:
-          model = MobileNetV2(bins)
+          model = MobileNetV2(torchvision.models.mobilenet_v2(pretrained=True))
           lr = args.lr_mobilenet
 
     # loading data
