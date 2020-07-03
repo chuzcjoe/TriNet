@@ -174,7 +174,7 @@ class MobileNetV2(nn.Module):
         super(MobileNetV2, self).__init__()
 
         self.features = features
-        self.in_c = 1000
+        self.last_channel = 1000
 
         self.fc_x1 = nn.Linear(self.last_channel, num_classes)
         self.fc_y1 = nn.Linear(self.last_channel, num_classes)
