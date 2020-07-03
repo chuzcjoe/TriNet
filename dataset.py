@@ -156,19 +156,25 @@ class TrainDataSet(Dataset):
         self.bins = np.linspace(-1,1,self.num_classes) 
         self.crop = crop
 
-        self.data_list = os.listdir(os.path.join(self.data_dir, 'imgs'))
+        #read trianing list
+        with open("train.txt","r") as f:
+            fts = f.read().splitlines()
+
+        self.data_list = [os.path.join(data_dir, x) for x in fts]
+
+        #self.data_list = os.listdir(os.path.join(self.data_dir, 'imgs'))
         self.length = len(self.data_list)
 
     def __getitem__(self, index):
 
-        base_name, _ = self.data_list[index].split('.')
+        #base_name, _ = os.path.basename(self.data_list[index]).split('.')
         # read image file
-        img = cv2.imread(os.path.join(self.data_dir, "imgs/" + base_name + ".jpg"))
+        img = cv2.imread(self.data_list[index])
 
         #crop head part
         if self.crop:
             # get face bounding box
-            bbox = bbox_300W(os.path.join(self.data_dir, "labels/" + base_name + ".txt"))
+            bbox = bbox_300W(self.data_list[index].replace('imgs/','labels/').replace('.jpg','.txt'))
             x_min, y_min, x_max, y_max = bbox
             img = img[y_min:y_max, x_min:x_max]
         
@@ -181,7 +187,7 @@ class TrainDataSet(Dataset):
 
 
         #get left vector, down vector, front vector
-        left_vector, down_vector, front_vector  = Vector300W(os.path.join(self.data_dir, "labels/" + base_name + '.txt'))
+        left_vector, down_vector, front_vector  = Vector300W(self.data_list[index].replace('imgs/','labels/').replace('.jpg','.txt'))
 
         vector_label_l = torch.FloatTensor(left_vector)
         vector_label_d = torch.FloatTensor(down_vector)
@@ -225,7 +231,7 @@ class TrainDataSet(Dataset):
 
         soft_label_f = torch.stack([soft_label_x, soft_label_y, soft_label_z])
 
-        return torch.from_numpy(img), soft_label_l, soft_label_d, soft_label_f, vector_label_l, vector_label_d, vector_label_f, os.path.join(self.data_dir, "imgs/" + base_name + ".jpg"), vector_label_l, vector_label_d, vector_label_f
+        return torch.from_numpy(img), soft_label_l, soft_label_d, soft_label_f, vector_label_l, vector_label_d, vector_label_f, self.data_list[index], vector_label_l, vector_label_d, vector_label_f
 
     def __len__(self):
         return self.length
@@ -238,16 +244,21 @@ class TestDataSet(Dataset):
         self.crop = crop
         self.input_size= input_size
         self.bins = np.linspace(-1,1,self.num_classes)
-        self.data_list = os.listdir(os.path.join(self.data_dir, 'imgs'))
+
+        with open("test.txt",'r') as f:
+            ftts = f.read().splitlines()
+
+        self.data_list = [os.path.join(data_dir, y) for y in ftts]
+
+        #self.data_list = os.listdir(os.path.join(self.data_dir, 'imgs'))
         self.length = len(self.data_list)
 
     def __getitem__(self, index):
-        base_name, _ = self.data_list[index].split('.')
-        img = cv2.imread(os.path.join(self.data_dir, "imgs/" + base_name + ".jpg"))
+        img = cv2.imread(self.data_list[index])
 
         if self.crop:
             # get face bbox
-            bbox = bbox_300W(os.path.join(self.data_dir, 'labels/' + base_name + '.txt'))
+            bbox = bbox_300W(self.data_list[index].replace("imgs/","labels/").replace(".jpg",".txt"))
             x_min = bbox[0]
             y_min = bbox[1]
             x_max = bbox[2]
@@ -261,7 +272,7 @@ class TestDataSet(Dataset):
 
 
         #get left vector, down vector and front vector
-        left_vector, down_vector, front_vector  = Vector300W(os.path.join(self.data_dir, "labels/" + base_name + '.txt'))
+        left_vector, down_vector, front_vector  = Vector300W(self.data_list[index].replace("imgs/","labels/").replace(".jpg",".txt"))
 
         vector_label_l = torch.FloatTensor(left_vector)
         vector_label_d = torch.FloatTensor(down_vector)
@@ -305,7 +316,7 @@ class TestDataSet(Dataset):
 
         soft_label_f = torch.stack([soft_label_x, soft_label_y, soft_label_z])
 
-        return torch.from_numpy(img), soft_label_l, soft_label_d, soft_label_f, vector_label_l, vector_label_d, vector_label_f, os.path.join(self.data_dir, "imgs/" + base_name + ".jpg"), vector_label_l, vector_label_d, vector_label_f
+        return torch.from_numpy(img), soft_label_l, soft_label_d, soft_label_f, vector_label_l, vector_label_d, vector_label_f, self.data_list[index], vector_label_l, vector_label_d, vector_label_f
 
     def __len__(self):
         # 1,969
