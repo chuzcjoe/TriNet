@@ -134,7 +134,7 @@ def train(net, bins, alpha, beta, batch_size):
           model = ResNet(torchvision.models.resnet50(pretrained=False), num_classes=bins)
           lr = args.lr_resnet
     else:
-          model = MobileNetV2(torchvision.models.mobilenet_v2(pretrained=True))
+          model = MobileNetV2(torchvision.models.mobilenet_v2(pretrained=True), num_classes=bins)
           lr = args.lr_mobilenet
 
     # loading data
